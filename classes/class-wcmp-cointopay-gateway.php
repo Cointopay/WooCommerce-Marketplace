@@ -23,17 +23,19 @@ class WCMP_Cointopay_Gateway {
         $this->file = $file;
         $this->plugin_url = trailingslashit(plugins_url('', $plugin = $file));
         $this->plugin_path = trailingslashit(dirname($file));
-        $this->token = WCMP_COINTOPAY_GATEWAY_PLUGIN_TOKEN;
-        $this->text_domain = WCMP_COINTOPAY_GATEWAY_TEXT_DOMAIN;
-        $this->version = WCMP_COINTOPAY_GATEWAY_PLUGIN_VERSION;
+        $this->token = 'wcmp-cointopay-gateway';
+        $this->text_domain = 'wcmp-cointopay-gateway';
+        $this->version = '1.0.3';
 
         add_action('init', array(&$this, 'init'), 0);
         $wcmp_cointopay_settings = get_option('woocommerce_wcmp-cointopay-payments_settings');
         $this->payment_admin_settings = get_option('wcmp_payment_settings_name');
+		
         if (isset($wcmp_cointopay_settings['enabled']) && $wcmp_cointopay_settings['enabled'] == 'yes' && WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
+			
             add_filter('automatic_payment_method', array($this, 'admin_cointopay_mode'), 10);
             add_filter('wcmp_vendor_payment_mode', array($this, 'vendor_cointopay_mode'), 10);
-            add_action('other_exta_field_dcmv', array(&$this, 'add_cointopay_email'));
+            add_action('other_exta_field_dcmv', array($this, 'add_cointopay_email'));
             add_action('woocommerce_order_status_cancelled', array(&$this, 'woocommerce_order_status_cancelled'));
         }
     }
@@ -91,6 +93,7 @@ class WCMP_Cointopay_Gateway {
     }
 
     public function vendor_cointopay_mode($arg) {
+		
         if (isset($this->payment_admin_settings['payment_method_cointopay']) && $this->payment_admin_settings['payment_method_cointopay'] = 'Enable') {
             $arg['cointopay'] = __('Cointopay', 'wcmp-cointopay-gateway');
         }
@@ -100,11 +103,28 @@ class WCMP_Cointopay_Gateway {
     public function add_cointopay_email() {
         $vendor_selected_payment_method = get_user_meta(get_current_user_id(), '_vendor_payment_mode', true);
         if ($vendor_selected_payment_method == 'cointopay') {
+			if(get_user_meta(get_current_user_id(), '_vendor_cointopay_email', true)){
+			
             $vendor_cointopay_email = get_user_meta(get_current_user_id(), '_vendor_cointopay_email', true);
+			}
+			else{
+				    global $current_user;
+					wp_get_current_user();
+				
+					$vendor_cointopay_email = $current_user->user_email; 
+			}
             ?>
-            <div class="wcmp_headding2"><?php _e('Cointopay', 'wcmp-cointopay-gateway'); ?></div>
-            <p><?php _e('Enter your Cointopay ID', 'wcmp-cointopay-gateway'); ?></p>
-            <input  class="long no_input" readonly type="text" name="vendor_cointopay_email" value="<?php echo $vendor_cointopay_email ? $vendor_cointopay_email : ''; ?>"  placeholder="<?php _e('Enter your Cointopay ID', 'wcmp-cointopay-gateway'); ?>">
+            <div class="panel panel-default pannel-outer-heading">
+            <div class="panel-heading"><h3><?php _e('Cointopay', 'wcmp-cointopay-gateway'); ?></h3></div>
+            <div class="panel-body panel-content-padding form-horizontal">
+            <div class="form-group">
+            <label class="control-label col-sm-3 col-md-3 facebook"><?php _e('Enter your Cointopay Email', 'wcmp-cointopay-gateway'); ?></label>
+            <div class="col-md-6 col-sm-9">
+            <input  class="long no_input form-control" readonly type="text" name="vendor_cointopay_email" value="<?php echo $vendor_cointopay_email ? $vendor_cointopay_email : ''; ?>"  placeholder="<?php _e('Enter your Cointopay Email', 'wcmp-cointopay-gateway'); ?>">
+            </div>
+            </div>
+            </div>
+            </div>
             <?php
         }
     }

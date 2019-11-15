@@ -9,11 +9,6 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
         $this->has_fields = false;
         $this->method_title = __('Cointopay Payments (WCMp Compatible)', 'wcmp-cointopay-gateway');
         $this->order_button_text = __('Proceed to Cointopay', 'wcmp-cointopay-gateway');
-
-        $this->api_prod_url = 'https://svcs.cointopay.com/AdaptivePayments/';
-        $this->api_sandbox_url = 'https://svcs.sandbox.cointopay.com/AdaptivePayments/';
-        $this->payment_prod_url = 'https://www.cointopay.com/cgi-bin/webscr';
-        $this->payment_sandbox_url = 'https://www.sandbox.cointopay.com/cgi-bin/webscr';
         $this->notify_url = WC()->api_request_url('WCMp_Cointopay_Payments_Gateway');
 
         $this->init_form_fields();
@@ -24,11 +19,8 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
         $this->description = $this->get_option('description');
         $this->cointopay_merchant_id = $this->get_option('cointopay_merchant_id');
         $this->cointopay_security_code = $this->get_option('cointopay_security_code');
-        $this->api_signature = $this->get_option('api_signature');
-        $this->app_id = $this->get_option('app_id');
         $this->receiver_email = $this->get_option('receiver_email');
         $this->method = $this->get_option('method');
-        $this->sandbox = $this->get_option('sandbox');
         $this->debug = $this->get_option('debug');
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
@@ -46,6 +38,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
      */
     public function process_payment($order_id) {global $woocommerce;
 				global $WCMp;
+				
 				$order = wc_get_order($order_id);
 				if (WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
 					require_once ( $WCMp->plugin_path . 'classes/class-wcmp-calculate-commission.php' );
@@ -58,35 +51,49 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 				if (sizeof($order->get_items()) > 0) : foreach ($order->get_items() as $item) :
 				if ($item['qty']) $item_names[] = $item['name'] . ' x ' . $item['qty'];
 				endforeach; endif;
-				$params = array(
-				"authentication:$this->apikey",
-				'cache-control: no-cache',
-				);
+
 				$item_name = sprintf( __('Order %s' , 'woocommerce'), $order->get_order_number() ) . " - " . implode(', ', $item_names);
 
-				$ch = curl_init();
+				$data = array(
+            'SecurityCode' => $this->cointopay_security_code,
+            'MerchantID' => $this->cointopay_merchant_id,
+            'Amount' => number_format($order->get_total(), 8, '.', ''),
+            'AltCoinID' => 666,
+			'output' => 'json',
+			'inputCurrency' => get_woocommerce_currency(),
+			'CustomerReferenceNr' => $order_id,
+			'returnurl' => rawurlencode(esc_url($this->get_return_url($order))),
+			'transactionconfirmurl' => site_url('/?wc-api=Cointopay'),
+			'transactionfailurl' => rawurlencode(esc_url($order->get_cancel_order_url())),
+        );
 
-				curl_setopt_array($ch, array(
-				CURLOPT_URL => 'https://app.cointopay.com/MerchantAPI?Checkout=true',
-				//CURLOPT_USERPWD => $this->apikey,
-				CURLOPT_POSTFIELDS => 'SecurityCode=' . $this->cointopay_security_code . '&MerchantID=' . $this->cointopay_merchant_id . '&Amount=' . number_format($order->get_total(), 8, '.', '') . '&AltCoinID=666&output=json&inputCurrency=' . get_woocommerce_currency() . '&CustomerReferenceNr=' . $order_id . '&returnurl='.rawurlencode(esc_url($this->get_return_url($order))).'&transactionconfirmurl='.site_url('/?wc-api=Cointopay') .'&transactionfailurl='.rawurlencode(esc_url($order->get_cancel_order_url())),
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_SSL_VERIFYPEER => false,
-				CURLOPT_HTTPHEADER => $params,
-				//CURLOPT_USERAGENT => $this->apikey,
-				CURLOPT_HTTPAUTH => CURLAUTH_BASIC
-				)
-				);
 
-				$redirect = curl_exec($ch);
-				curl_close($ch);
-				if($redirect){
-					$results = json_decode($redirect);
+        // Sets the post params.
+        $params = array(
+            'body' => 'SecurityCode=' . $this->cointopay_security_code . '&MerchantID=' . $this->cointopay_merchant_id . '&Amount=' . number_format($order->get_total(), 8, '.', '') . '&AltCoinID=666&output=json&inputCurrency=' . get_woocommerce_currency() . '&CustomerReferenceNr=' . $order_id . '&returnurl='.rawurlencode(esc_url($this->get_return_url($order))).'&transactionconfirmurl='.site_url('/?wc-api=Cointopay') .'&transactionfailurl='.rawurlencode(esc_url($order->get_cancel_order_url())),
+        );
+
+
+            $url = 'https://app.cointopay.com/MerchantAPI?Checkout=true';
+
+        if ('yes' == $this->debug) {
+            doCointopayLog('Setting payment options with the following data: ' . print_r($data, true));
+        }
+
+        $response = wp_safe_remote_post($url, $params);
+        if (!is_wp_error($response) && 200 == $response['response']['code'] && 'OK' == $response['response']['message']) {
+            $results = json_decode($response['body']);
 					return array(
 					'result' => 'success',
 					'redirect' => $results->RedirectURL
 					);
-				}}
+        } else {
+            if ('yes' == $this->debug) {
+                doCointopayLog('Failed to configure payment options: ' . print_r($response, true));
+            }
+        }
+				
+}
 
 
     /**
@@ -174,62 +181,6 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
      *
      * @param string $pay_key
      */
-    protected function set_payment_options($pay_key) {
-
-        $data = array(
-            'payKey' => $pay_key,
-            'requestEnvelope' => array(
-                'errorLanguage' => 'en_US',
-                'detailLevel' => 'ReturnAll'
-            ),
-            'displayOptions' => array(
-                'businessName' => trim(substr(get_option('blogname'), 0, 128))
-            ),
-            'senderOptions' => array(
-                'referrerCode' => 'WCMp_Cart'
-            )
-        );
-
-        if ('' != $this->header_image) {
-            $data['displayOptions']['headerImageUrl'] = $this->header_image;
-        }
-
-        // Sets the post params.
-        $params = array(
-            'body' => json_encode($data),
-            'timeout' => 60,
-            'httpversion' => '1.1',
-            'headers' => array(
-                'X-PAYPAL-SECURITY-USERID' => $this->cointopay_merchant_id,
-                'X-PAYPAL-SECURITY-PASSWORD' => $this->cointopay_security_code,
-                'X-PAYPAL-SECURITY-SIGNATURE' => $this->api_signature,
-                'X-PAYPAL-REQUEST-DATA-FORMAT' => 'JSON',
-                'X-PAYPAL-RESPONSE-DATA-FORMAT' => 'JSON',
-                'X-PAYPAL-APPLICATION-ID' => $this->app_id,
-            )
-        );
-
-        if ('yes' == $this->sandbox) {
-            $url = $this->api_sandbox_url;
-        } else {
-            $url = $this->api_prod_url;
-        }
-
-        if ('yes' == $this->debug) {
-            doCointopayLog('Setting payment options with the following data: ' . print_r($data, true));
-        }
-
-        $response = wp_safe_remote_post($url . 'SetPaymentOptions', $params);
-        if (!is_wp_error($response) && 200 == $response['response']['code'] && 'OK' == $response['response']['message']) {
-            if ('yes' == $this->debug) {
-                doCointopayLog('Payment options configured successfully!');
-            }
-        } else {
-            if ('yes' == $this->debug) {
-                doCointopayLog('Failed to configure payment options: ' . print_r($response, true));
-            }
-        }
-    }
 	public function admin_options()
 			{
 				?>
@@ -294,7 +245,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 
     protected function admin_notices() {
         if (is_admin()) {
-            if ('yes' == $this->get_option('enabled') && ( empty($this->cointopay_merchant_id) || empty($this->cointopay_security_code) || empty($this->api_signature) || empty($this->app_id) || empty($this->receiver_email) )) {
+            if ('yes' == $this->get_option('enabled') && ( empty($this->cointopay_merchant_id) || empty($this->cointopay_security_code) || empty($this->receiver_email) )) {
                 add_action('admin_notices', array($this, 'gateway_not_configured_message'));
             }
             if (!$this->using_supported_currency()) {
@@ -313,7 +264,8 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 
     public function gateway_not_configured_message() {
         $id = 'woocommerce_wcmp-cointopay-payments_';
-        if (isset($_POST[$id . 'cointopay_merchant_id']) && !empty($_POST[$id . 'cointopay_merchant_id']) && isset($_POST[$id . 'cointopay_security_code']) && !empty($_POST[$id . 'cointopay_security_code'])) {
+		$c_cointopay_merchant_id = intval($_POST[$id . 'cointopay_merchant_id']);
+        if (isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id) && isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id)) {
             return;
         }
         echo '<div class="error"><p><strong>' . __('Cointopay Payments Disabled For WC Marketplace', 'wcmp-cointopay-gateway') . '</strong>: ' . __('You must fill the Merchant ID, Security code options.', 'wcmp-cointopay-gateway') . '</p></div>';
@@ -326,17 +278,20 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     public function cointopay_ipn_response() {
 				global $woocommerce;
                 $woocommerce->cart->empty_cart();
-				$Cointopay = $_REQUEST;
-				$order_id = intval($Cointopay['CustomerReferenceNr']);
+				$order_id = intval($_REQUEST['CustomerReferenceNr']);
+				$o_status = sanitize_text_field($_REQUEST['status']);
+				$o_TransactionID = sanitize_text_field($_REQUEST['TransactionID']);
+				$o_ConfirmCode = sanitize_text_field($_REQUEST['ConfirmCode']);
+				$notenough = sanitize_text_field($_REQUEST['notenough']);
 
 				$order = new WC_Order($order_id);
 				$data = [ 
                            'mid' => $this->cointopay_merchant_id , 
-                           'TransactionID' => $_REQUEST['TransactionID'] ,
-                           'ConfirmCode' => $_REQUEST['ConfirmCode']
+                           'TransactionID' => $o_TransactionID ,
+                           'ConfirmCode' => $o_ConfirmCode
                       ];
               $response = $this->validateOrder($data);
-			  if($response->Status !== $_REQUEST['status'])
+			  if($response->Status !== $o_status)
               {
 				   $this->delete_associated_commission($order_id);
 				  get_header();
@@ -353,9 +308,9 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 					get_footer();
                   exit;
               }
-			   else if($response->CustomerReferenceNr == $_REQUEST['CustomerReferenceNr'])
+			   else if($response->CustomerReferenceNr == $order_id)
               {
-				    if ($Cointopay['status'] == 'paid' && $_REQUEST['notenough']==0) {
+				    if ($o_status == 'paid' && $notenough==0) {
 					// Do your magic here, and return 200 OK to Cointopay.
 
 					if ($order->status == 'completed')
@@ -392,7 +347,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 					//header('HTTP/1.1 200 OK');
 					exit;
 				}
-				else if ($Cointopay['status'] == 'failed' && $Cointopay['notenough'] == 1) {
+				else if ($o_status == 'failed' && $notenough == 1) {
 
 					$order->update_status( 'on-hold', sprintf( __( 'IPN: Payment failed notification from Cointopay because notenough', 'woocommerce' ) ) );
 					 $this->delete_associated_commission($order_id);
@@ -478,24 +433,31 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 			}
 
 public function validateOrder($data){
-			   $params = array(
-			   "authentication:1",
-			   'cache-control: no-cache',
-			   );
-				$ch = curl_init();
-				curl_setopt_array($ch, array(
-				CURLOPT_URL => 'https://app.cointopay.com/v2REAPI?',
-				//CURLOPT_USERPWD => $this->apikey,
-				CURLOPT_POSTFIELDS => 'MerchantID='.$data['mid'].'&Call=QA&APIKey=_&output=json&TransactionID='.$data['TransactionID'].'&ConfirmCode='.$data['ConfirmCode'],
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_SSL_VERIFYPEER => false,
-				CURLOPT_HTTPHEADER => $params,
-				CURLOPT_USERAGENT => 1,
-				CURLOPT_HTTPAUTH => CURLAUTH_BASIC
-				)
-				);
-				$response = curl_exec($ch);
-				$results = json_decode($response);
+			   $data_j = array(
+            'MerchantID' => $data['mid'],
+            'Call' => 'QA',
+            'APIKey' => '_',
+			'output' => 'json',
+			'TransactionID' => $data['TransactionID'],
+			'ConfirmCode' => $data['ConfirmCode'],
+        );
+
+        // Sets the post params.
+        $params = array(
+            'body' => 'MerchantID='.$data['mid'].'&Call=QA&APIKey=_&output=json&TransactionID='.$data['TransactionID'].'&ConfirmCode='.$data['ConfirmCode'],
+			'authentication' => 1,
+			'cache-control' => 'no-cache',
+        );
+
+
+            $url = 'https://app.cointopay.com/v2REAPI?';
+
+        if ('yes' == $this->debug) {
+            doCointopayLog('Setting payment options with the following data: ' . print_r($data, true));
+        }
+
+        $response = wp_safe_remote_post($url, $params);
+         $results = json_decode($response['body']);
 				if($results->CustomerReferenceNr)
 				{
 					return $results;

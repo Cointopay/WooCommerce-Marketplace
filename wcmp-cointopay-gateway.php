@@ -19,14 +19,7 @@ if (!class_exists('WCMP_Cointopay_Gateway_Dependencies')) {
     require_once 'includes/class-wcmp-cointopay-gateway-dependencies.php';
 }
 require_once 'includes/wcmp-cointopay-gateway-core-functions.php';
-require_once 'wcmp-cointopay-gateway-config.php';
 
-if (!defined('WCMP_COINTOPAY_GATEWAY_PLUGIN_TOKEN')) {
-    exit;
-}
-if (!defined('WCMP_COINTOPAY_GATEWAY_TEXT_DOMAIN')) {
-    exit;
-}
 
 if(!WCMP_Cointopay_Gateway_Dependencies::woocommerce_active_check()){
     add_action('admin_notices', 'woocommerce_inactive_notice');
