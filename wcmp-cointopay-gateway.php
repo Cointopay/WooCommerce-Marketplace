@@ -1,15 +1,10 @@
 <?php
-
 /**
  * Plugin Name: WCMp Cointopay Gateway
  * Plugin URI: https://therightsw.com/
  * Description: WCMp Cointopay Gateway is a payment gateway for woocommerce shopping plateform also compatible with WC Marketplace.
- * Author: Goshila Sadaf
+ * Author: Cointopay
  * Version: 1.0
- * Author URI: https://therightsw.com/
- *
- * Text Domain: wcmp-cointopay-gateway
- * Domain Path: /languages/
  */
 if (!defined('ABSPATH')) {
     // Exit if accessed directly
