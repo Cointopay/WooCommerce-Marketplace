@@ -265,10 +265,12 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     public function gateway_not_configured_message() {
         $id = 'woocommerce_wcmp-cointopay-payments_';
 		$c_cointopay_merchant_id = intval($_POST[$id . 'cointopay_merchant_id']);
-        if (isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id) && isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id)) {
+		if (isset($c_cointopay_merchant_id) && 0 !== $c_cointopay_merchant_id){
+        if (!empty($c_cointopay_merchant_id) && isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id)) {
             return;
         }
-        echo '<div class="error"><p><strong>' . __('Cointopay Payments Disabled For WC Marketplace', 'wcmp-cointopay-gateway') . '</strong>: ' . __('You must fill the Merchant ID, Security code options.', 'wcmp-cointopay-gateway') . '</p></div>';
+        echo $c_cointopay_merchant_id.'<div class="error"><p><strong>' . __('Cointopay Payments Disabled For WC Marketplace', 'wcmp-cointopay-gateway') . '</strong>: ' . __('You must fill the Merchant ID, Security code options.', 'wcmp-cointopay-gateway') . '</p></div>';
+		}
     }
 
     public function unsupported_currency_not_message() {
