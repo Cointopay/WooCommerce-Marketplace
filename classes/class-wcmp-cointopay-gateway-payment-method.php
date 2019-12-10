@@ -5,7 +5,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     public function __construct() {
         global $WCMP_Cointopay_Gateway;
         $this->id = 'wcmp-cointopay-payments';
-        $this->icon = $WCMP_Cointopay_Gateway->plugin_url . 'assets/images/cointopay.png';
+        $this->icon = plugins_url('assets/images/cointopay.png', __FILE__);
         $this->has_fields = false;
         $this->method_title = __('Cointopay Payments (WCMp Compatible)', 'wcmp-cointopay-gateway');
         $this->order_button_text = __('Proceed to Cointopay', 'wcmp-cointopay-gateway');
@@ -40,6 +40,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 				global $WCMp;
 				
 				$order = wc_get_order($order_id);
+				$cointopay_alt_coin = get_post_meta( $order_id, 'cointopay_alt_coin', true);
 				if (WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
 					require_once ( $WCMp->plugin_path . 'classes/class-wcmp-calculate-commission.php' );
 					$commission_obj = new WCMp_Calculate_Commission();
@@ -58,7 +59,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
             'SecurityCode' => $this->cointopay_security_code,
             'MerchantID' => $this->cointopay_merchant_id,
             'Amount' => number_format($order->get_total(), 8, '.', ''),
-            'AltCoinID' => 666,
+            'AltCoinID' => $cointopay_alt_coin,
 			'output' => 'json',
 			'inputCurrency' => get_woocommerce_currency(),
 			'CustomerReferenceNr' => $order_id,
@@ -70,7 +71,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 
         // Sets the post params.
         $params = array(
-            'body' => 'SecurityCode=' . $this->cointopay_security_code . '&MerchantID=' . $this->cointopay_merchant_id . '&Amount=' . number_format($order->get_total(), 8, '.', '') . '&AltCoinID=666&output=json&inputCurrency=' . get_woocommerce_currency() . '&CustomerReferenceNr=' . $order_id . '&returnurl='.rawurlencode(esc_url($this->get_return_url($order))).'&transactionconfirmurl='.site_url('/?wc-api=Cointopay') .'&transactionfailurl='.rawurlencode(esc_url($order->get_cancel_order_url())),
+            'body' => 'SecurityCode=' . $this->cointopay_security_code . '&MerchantID=' . $this->cointopay_merchant_id . '&Amount=' . number_format($order->get_total(), 8, '.', '') . '&AltCoinID='.$cointopay_alt_coin.'&output=json&inputCurrency=' . get_woocommerce_currency() . '&CustomerReferenceNr=' . $order_id . '&returnurl='.rawurlencode(esc_url($this->get_return_url($order))).'&transactionconfirmurl='.site_url('/?wc-api=Cointopay') .'&transactionfailurl='.rawurlencode(esc_url($order->get_cancel_order_url())),
         );
 
 
@@ -242,7 +243,14 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
             )
         );
     }
-
+   public function wcmp_coins_select_options() {
+	return array(
+		'' => __( 'Nope', 'cmb2' ),
+		'standard' => __( 'Option One', 'cmb2' ),
+		'custom'   => __( 'Option Two', 'cmb2' ),
+		'none'     => __( 'Option Three', 'cmb2' ),
+	);
+}
     protected function admin_notices() {
         if (is_admin()) {
             if ('yes' == $this->get_option('enabled') && ( empty($this->cointopay_merchant_id) || empty($this->cointopay_security_code) || empty($this->receiver_email) )) {
