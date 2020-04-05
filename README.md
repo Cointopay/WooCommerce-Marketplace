@@ -16,6 +16,7 @@ The much awaited <strong>WCMP Cointopay Payment gateway</strong> is now live.
 
 <strong>WCMP Cointopay Gateway</strong> is a <strong>WC Marketplace</strong> add-on that allows instant (chain or parallel) payment to vendors.
 
+Source for this plugin from the official release location: https://wordpress.org/plugins/wcmp-cointopay-gateway/
 
 <strong>Admin can</strong>
 
