@@ -5,7 +5,7 @@
  * Plugin URI: https://cointopay.com/
  * Description: WCMP Cointopay Gateway is a payment gateway for woocommerce shopping plateform also compatible with WC Marketplace.
  * Author: Cointopay.com
- * Version: 1.1.1
+ * Version: 1.2.0
  * Author URI: https://cointopay.com/
  *
  * Text Domain: wcmp-cointopay-gateway
@@ -35,13 +35,13 @@ add_filter('automatic_payment_method', 'admin_cointopay_mode_i', 10);
         return $arg;
     }
 if (!class_exists('WCMP_Cointopay_Gateway') && WCMP_Cointopay_Gateway_Dependencies::woocommerce_active_check()) {
-    require_once( 'classes/class-wcmp-cointopay-gateway.php' );
+    require_once( ABSPATH . 'wp-content/plugins/wcmp-cointopay-gateway/classes/class-wcmp-cointopay-gateway.php' );
     global $WCMP_Cointopay_Gateway;
     $WCMP_Cointopay_Gateway = new WCMP_Cointopay_Gateway(__FILE__);
     $GLOBALS['WCMP_Cointopay_Gateway'] = $WCMP_Cointopay_Gateway;
 	function WCMP_Cointopay_Gateway_admin_js() {
     $url = plugins_url('assets/js/wcmp_custom_js.js', __FILE__);
-    echo '"<script type="text/javascript" src="'. $url . '"></script>"';
+    echo '<script type="text/javascript" src="'. $url . '"></script>';
 	}
 	add_action('wp_footer', 'WCMP_Cointopay_Gateway_admin_js');
 }
@@ -95,8 +95,8 @@ function getMerchantCoins($merchantId)
 add_action('woocommerce_after_order_notes', 'cointopay_add_select_checkout_field');
 function cointopay_add_select_checkout_field( $checkout ) {
 	 global $WCMP_Cointopay_Gateway;
-if(get_option('	woocommerce_wcmp-cointopay-payments_settings') && get_option('	woocommerce_wcmp-cointopay-payments_settings') !== ''){
-		$cointopay_payments_settings = get_option('	woocommerce_wcmp-cointopay-payments_settings', true);
+if(get_option('woocommerce_wcmp-cointopay-payments_settings') && get_option('woocommerce_wcmp-cointopay-payments_settings') !== ''){
+		$cointopay_payments_settings = get_option('woocommerce_wcmp-cointopay-payments_settings', true);
 if($cointopay_payments_settings['enabled'] === 'yes' && $cointopay_payments_settings['cointopay_merchant_id'] !== ''){
     // The user link
     $cointopay_merchant_id = $cointopay_payments_settings['cointopay_merchant_id'];
@@ -132,8 +132,8 @@ function cointopay_process_custom_payment(){
 add_action( 'woocommerce_after_order_notes', 'cointopay_checkout_hidden_field', 10, 1 );
 function cointopay_checkout_hidden_field( $checkout ) {
 	global $WCMP_Cointopay_Gateway;
-    if(get_option('	woocommerce_wcmp-cointopay-payments_settings') && get_option('	woocommerce_wcmp-cointopay-payments_settings') !== ''){
-		$cointopay_payments_settings = get_option('	woocommerce_wcmp-cointopay-payments_settings', true);
+    if(get_option('woocommerce_wcmp-cointopay-payments_settings') && get_option('woocommerce_wcmp-cointopay-payments_settings') !== ''){
+		$cointopay_payments_settings = get_option('woocommerce_wcmp-cointopay-payments_settings', true);
 if($cointopay_payments_settings['enabled'] === 'yes' && $cointopay_payments_settings['cointopay_merchant_id'] !== ''){
     // The user link
     $cointopay_merchant_id = $cointopay_payments_settings['cointopay_merchant_id'];
@@ -143,3 +143,13 @@ if($cointopay_payments_settings['enabled'] === 'yes' && $cointopay_payments_sett
 	}
 	}
 }
+add_action('wp_head', 'wcmp_cointopay_pluginname_ajaxurl');
+function wcmp_cointopay_pluginname_ajaxurl()
+ {
+?>
+<script type="text/javascript">
+var ajaxurl = '<?php echo admin_url('admin-ajax.php');?>';
+</script>
+<?php
+}
+		

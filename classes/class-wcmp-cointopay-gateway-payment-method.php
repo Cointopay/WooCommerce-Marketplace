@@ -5,7 +5,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     public function __construct() {
         global $WCMP_Cointopay_Gateway;
         $this->id = 'wcmp-cointopay-payments';
-        $this->icon = plugins_url('assets/images/cointopay.png', __FILE__);
+        $this->icon = $WCMP_Cointopay_Gateway->plugin_url . 'assets/images/cointopay.png';
         $this->has_fields = false;
         $this->method_title = __('Cointopay Payments (WCMp Compatible)', 'wcmp-cointopay-gateway');
         $this->order_button_text = __('Proceed to Cointopay', 'wcmp-cointopay-gateway');

@@ -2,8 +2,8 @@
 Contributors: cointopay, therightsw
 Tags: cointopay gateway, wcmp, wc marketplace, commission, vendor, crypto
 Requires at least: 4.2
-Tested up to: 5.2.4
-Stable tag: 1.1.1
+Tested up to: 5.6.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,12 +33,12 @@ needs to be installed and activated on your WordPress site for this plugin to wo
    manually, make sure that it's uploaded to /WP-content/plug ins/ and activate the plug in from the Plugin menu from your WordPress dashboard.      
    Alternatively, follow these steps below and install the addon: 
    Plugins > Add new > Upload plugin > Upload wcmp-cointopay-gateway.zip > Install Now > Activate Plug in.
-5. Configure the checkout settings from WooCommerce > Settings > Checkout tab > Cointopay sub tab.
-6. Configure marketplace features from Woocommerce > WCMP > Payment tab > Cointopay sub tab.
+5. Configure marketplace features from WCMp > Settings > Payment tab
+6. Configure the checkout settings from WooCommerce > Settings > Payment tab > Cointopay.
 
 == Changelog ==
 = 2019-12-06 - Version 1.1.0 =
 * Bug fixing for merchant id integer check
 
-= 2019-12-10 - Version 1.1.0 =
+= 2019-12-10 - Version 1.1.1 =
 * Give AltCoint select option in checkhout page
