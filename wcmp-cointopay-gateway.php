@@ -5,7 +5,7 @@
  * Plugin URI: https://cointopay.com/
  * Description: WCMP Cointopay Gateway is a payment gateway for woocommerce shopping plateform also compatible with WC Marketplace.
  * Author: Cointopay.com
- * Version: 1.2.2
+ * Version: 1.2.3
  * Author URI: https://cointopay.com/
  *
  * Text Domain: wcmp-cointopay-gateway
@@ -24,16 +24,7 @@ require_once 'includes/wcmp-cointopay-gateway-core-functions.php';
 if(!WCMP_Cointopay_Gateway_Dependencies::woocommerce_active_check()){
     add_action('admin_notices', 'woocommerce_inactive_notice');
 }
-add_filter('automatic_payment_method', 'admin_cointopay_mode_i', 10);
-/**
-     * Add payment gatway to woocommerce
-     * @param array $arg
-     * @return array
-     */
-   function admin_cointopay_mode_i($arg) {
-        $arg['cointopay'] = __('Cointopay', 'wcmp-cointopay-gateway');
-        return $arg;
-    }
+
 if (!class_exists('WCMP_Cointopay_Gateway') && WCMP_Cointopay_Gateway_Dependencies::woocommerce_active_check()) {
     require_once( ABSPATH . 'wp-content/plugins/wcmp-cointopay-gateway/classes/class-wcmp-cointopay-gateway.php' );
     global $WCMP_Cointopay_Gateway;

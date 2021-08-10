@@ -3,7 +3,7 @@ Contributors: cointopay, therightsw
 Tags: cointopay gateway, wcmp, wc marketplace, commission, vendor, crypto
 Requires at least: 4.2
 Tested up to: 5.8.0
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,11 +30,10 @@ needs to be installed and activated on your WordPress site for this plugin to wo
 1. Download and install Woocommerce
 2. Download and install WC Marketplace
 4. Download and install WCMP Cointopay Gateway plugin using the built-in Word Press plugin installer. If you download WCMp Cointopay Gateway plugin 
-   manually, make sure that it's uploaded to /WP-content/plug ins/ and activate the plug in from the Plugin menu from your WordPress dashboard.      
+   manually, make sure that it's uploaded to /wp-content/plugins/ and activate the plugin from the Plugin menu from your WordPress dashboard.      
    Alternatively, follow these steps below and install the addon: 
    Plugins > Add new > Upload plugin > Upload wcmp-cointopay-gateway.zip > Install Now > Activate Plug in.
-5. Configure marketplace features from WCMp > Settings > Payment tab
-6. Configure the checkout settings from WooCommerce > Settings > Payment tab > Cointopay.
+5. Configure the checkout settings from WooCommerce > Settings > Payment tab > Cointopay.
 
 == Changelog ==
 = 2019-12-06 - Version 1.1.0 =

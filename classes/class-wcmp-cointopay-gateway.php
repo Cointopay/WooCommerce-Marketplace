@@ -25,17 +25,13 @@ class WCMP_Cointopay_Gateway {
         $this->plugin_path = trailingslashit(dirname($file));
         $this->token = 'wcmp-cointopay-gateway';
         $this->text_domain = 'wcmp-cointopay-gateway';
-        $this->version = '1.0.3';
+        $this->version = '1.2.3';
 
         add_action('init', array(&$this, 'init'), 0);
         $wcmp_cointopay_settings = get_option('woocommerce_wcmp-cointopay-payments_settings');
         $this->payment_admin_settings = get_option('wcmp_payment_settings_name');
 		
         if (isset($wcmp_cointopay_settings['enabled']) && $wcmp_cointopay_settings['enabled'] == 'yes' && WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
-			
-            add_filter('automatic_payment_method', array($this, 'admin_cointopay_mode'), 10);
-            add_filter('wcmp_vendor_payment_mode', array($this, 'vendor_cointopay_mode'), 10);
-            add_action('other_exta_field_dcmv', array($this, 'add_cointopay_email'));
             add_action('woocommerce_order_status_cancelled', array(&$this, 'woocommerce_order_status_cancelled'));
         }
     }
@@ -55,21 +51,7 @@ class WCMP_Cointopay_Gateway {
         if (class_exists('WC_Payment_Gateway')) {
             $this->load_class('payment-method');
             add_filter('woocommerce_payment_gateways', array($this, 'add_cointopay_gateway'));
-            if (WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
-                $this->load_class('wcmp-payment-method');
-                add_filter('wcmp_payment_gateways', array(&$this, 'add_wcmp_cointopay_payment_gateway'));
-            }
         }
-    }
-
-    /**
-     * Add payment gatway to woocommerce
-     * @param array $arg
-     * @return array
-     */
-    public function admin_cointopay_mode($arg) {
-        $arg['cointopay'] = __('Cointopay', 'wcmp-cointopay-gateway');
-        return $arg;
     }
 
     /**
@@ -80,53 +62,6 @@ class WCMP_Cointopay_Gateway {
     public function add_cointopay_gateway($methods) {
         $methods[] = 'WCMP_Cointopay_Gateway_Payment_Method';
         return $methods;
-    }
-
-    /**
-     * Add payment gatway to WCMp
-     * @param array $load_gateways
-     * @return array
-     */
-    public function add_wcmp_cointopay_payment_gateway($load_gateways) {
-        $load_gateways[] = 'WCMp_Gateway_Cointopay';
-        return $load_gateways;
-    }
-
-    public function vendor_cointopay_mode($arg) {
-		
-        if (isset($this->payment_admin_settings['payment_method_cointopay']) && $this->payment_admin_settings['payment_method_cointopay'] = 'Enable') {
-            $arg['cointopay'] = __('Cointopay', 'wcmp-cointopay-gateway');
-        }
-        return $arg;
-    }
-
-    public function add_cointopay_email() {
-        $vendor_selected_payment_method = get_user_meta(get_current_user_id(), '_vendor_payment_mode', true);
-        if ($vendor_selected_payment_method == 'cointopay') {
-			if(get_user_meta(get_current_user_id(), '_vendor_cointopay_email', true)){
-			
-            $vendor_cointopay_email = get_user_meta(get_current_user_id(), '_vendor_cointopay_email', true);
-			}
-			else{
-				    global $current_user;
-					wp_get_current_user();
-				
-					$vendor_cointopay_email = $current_user->user_email; 
-			}
-            ?>
-            <div class="panel panel-default pannel-outer-heading">
-            <div class="panel-heading"><h3><?php _e('Cointopay', 'wcmp-cointopay-gateway'); ?></h3></div>
-            <div class="panel-body panel-content-padding form-horizontal">
-            <div class="form-group">
-            <label class="control-label col-sm-3 col-md-3 facebook"><?php _e('Enter your Cointopay Email', 'wcmp-cointopay-gateway'); ?></label>
-            <div class="col-md-6 col-sm-9">
-            <input  class="long no_input form-control" readonly type="text" name="vendor_cointopay_email" value="<?php echo $vendor_cointopay_email ? $vendor_cointopay_email : ''; ?>"  placeholder="<?php _e('Enter your Cointopay Email', 'wcmp-cointopay-gateway'); ?>">
-            </div>
-            </div>
-            </div>
-            </div>
-            <?php
-        }
     }
 
     public function woocommerce_order_status_cancelled($order_id) {
