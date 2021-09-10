@@ -6,14 +6,11 @@ class WCMP_Cointopay_Gateway {
     public $plugin_path;
     public $version;
     public $token;
-    public $text_domain;
     public $library;
     public $shortcode;
     public $admin;
     public $frontend;
     public $template;
-    public $ajax;
-    private $file;
     public $settings;
     public $dc_wp_fields;
     public $payment_admin_settings;
@@ -24,8 +21,7 @@ class WCMP_Cointopay_Gateway {
         $this->plugin_url = trailingslashit(plugins_url('', $plugin = $file));
         $this->plugin_path = trailingslashit(dirname($file));
         $this->token = 'wcmp-cointopay-gateway';
-        $this->text_domain = 'wcmp-cointopay-gateway';
-        $this->version = '1.2.3';
+        $this->version = '1.2.4';
 
         add_action('init', array(&$this, 'init'), 0);
         $wcmp_cointopay_settings = get_option('woocommerce_wcmp-cointopay-payments_settings');
@@ -40,9 +36,6 @@ class WCMP_Cointopay_Gateway {
      * initilize plugin on WP init
      */
     function init() {
-
-        // Init Text Domain
-        $this->load_plugin_textdomain();
 
         if (!is_admin() || defined('DOING_AJAX')) {
             $this->load_class('frontend');
@@ -82,21 +75,6 @@ class WCMP_Cointopay_Gateway {
             $wpdb->delete($wpdb->prefix . 'wcmp_vendor_orders', array('order_id' => $order_id), array('%d'));
             delete_post_meta($order_id, '_commissions_processed');
         }
-    }
-
-    /**
-     * Load Localisation files.
-     *
-     * Note: the first-loaded translation file overrides any following ones if the same translation is present
-     *
-     * @access public
-     * @return void
-     */
-    public function load_plugin_textdomain() {
-        $locale = is_admin() && function_exists('get_user_locale') ? get_user_locale() : get_locale();
-        $locale = apply_filters('plugin_locale', $locale, 'wcmp-cointopay-gateway');
-        load_textdomain('wcmp-cointopay-gateway', WP_LANG_DIR . '/wcmp-cointopay-gateway/wcmp-cointopay-gateway-' . $locale . '.mo');
-        load_plugin_textdomain('wcmp-cointopay-gateway', false, plugin_basename(dirname(dirname(__FILE__))) . '/languages');
     }
 
     public function load_class($class_name = '') {

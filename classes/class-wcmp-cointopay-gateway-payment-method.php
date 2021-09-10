@@ -422,40 +422,4 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
         }
     }
 
-    protected function commission_payment_compleate($order_id) {
-        if (WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
-            global $WCMp;
-			
-            $vendor_orders_in_order = get_wcmp_vendor_orders(array('order_id' => $order_id));
-            if (!empty($vendor_orders_in_order)) {
-					
-                $commission_ids = wp_list_pluck($vendor_orders_in_order, 'commission_id');
-                if ($commission_ids && is_array($commission_ids)) {
-                    $commission_to_pay = array();
-                    foreach ($commission_ids as $commission_id) {
-                        $vendor_term_id = get_post_meta($commission_id, '_commission_vendor', true);
-                        if ($vendor_term_id) {
-						
-                            $vendor = get_wcmp_vendor_by_term($vendor_term_id);
-                            $vendor_payment_method = get_user_meta($vendor->id, '_vendor_payment_mode', true);
-                            //$vendor_cointopay_email = get_user_meta($vendor->id, '_vendor_cointopay_email', true);
-                            if ($vendor_payment_method == 'cointopay' && apply_filters('is_wcmp_vendor_receive_cointopay', true, $vendor)) {
-                                $commission_to_pay[$vendor_term_id][] = $commission_id;
-                            }
-                        }
-                    }
-                    foreach ($commission_to_pay as $vendor_term_id => $commissions) {
-                        $vendor = get_wcmp_vendor_by_term($vendor_term_id);
-                        $payment_method = get_user_meta($vendor->id, '_vendor_payment_mode', true);
-                        if ($payment_method && $payment_method == 'cointopay') {
-                            if (array_key_exists($payment_method, $WCMp->payment_gateway->payment_gateways)) {
-                                $WCMp->payment_gateway->payment_gateways[$payment_method]->process_payment($vendor, $commissions, 'gateway');
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
