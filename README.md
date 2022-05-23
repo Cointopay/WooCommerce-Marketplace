@@ -6,9 +6,9 @@ Tags: cointopay gateway, wcmp, wc marketplace, commission, vendor
 
 Requires at least: 4.2
 
-Tested up to: 5.9.0
+Tested up to: 6.0.0
 
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 
 License: GPLv2 or later
 
