@@ -2,8 +2,8 @@
 Contributors: cointopay, therightsw
 Tags: cointopay gateway, wcmp, wc marketplace, commission, vendor, crypto
 Requires at least: 4.2
-Tested up to: 5.9.0
-Stable tag: 1.2.5
+Tested up to: 6.0.0
+Stable tag: 1.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
