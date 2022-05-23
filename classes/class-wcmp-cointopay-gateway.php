@@ -21,7 +21,7 @@ class WCMP_Cointopay_Gateway {
         $this->plugin_url = trailingslashit(plugins_url('', $plugin = $file));
         $this->plugin_path = trailingslashit(dirname($file));
         $this->token = 'wcmp-cointopay-gateway';
-        $this->version = '1.2.4';
+        $this->version = '1.2.6';
 
         add_action('init', array(&$this, 'init'), 0);
         $wcmp_cointopay_settings = get_option('woocommerce_wcmp-cointopay-payments_settings');
