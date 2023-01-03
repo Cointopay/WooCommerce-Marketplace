@@ -1,3 +1,5 @@
+#PRODUCT NOW NOT WCMP BUT MULTIVENDORX === REPO HAS BEEN RENAMED TO https://github.com/Cointopay/Wordpress-MultivendorX
+
 # MVX Cointopay Gateway
 
 Contributors: cointopay
