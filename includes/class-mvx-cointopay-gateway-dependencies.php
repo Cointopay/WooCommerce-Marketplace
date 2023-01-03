@@ -4,7 +4,7 @@
  * WC Dependency Checker
  *
  */
-class WCMP_Cointopay_Gateway_Dependencies {
+class MVX_Cointopay_Gateway_Dependencies {
 
     private static $active_plugins;
 
@@ -21,7 +21,7 @@ class WCMP_Cointopay_Gateway_Dependencies {
         return in_array('woocommerce/woocommerce.php', self::$active_plugins) || array_key_exists('woocommerce/woocommerce.php', self::$active_plugins);
     }
     
-    public static function wcmp_active_check() {
+    public static function mvx_active_check() {
         if (!self::$active_plugins) {
             self::init();
         }

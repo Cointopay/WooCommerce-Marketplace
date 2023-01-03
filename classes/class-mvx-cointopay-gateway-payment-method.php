@@ -1,15 +1,15 @@
 <?php
 
-class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
+class MVX_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 
     public function __construct() {
-        global $WCMP_Cointopay_Gateway;
-        $this->id = 'wcmp-cointopay-payments';
-        $this->icon = $WCMP_Cointopay_Gateway->plugin_url . 'assets/images/cointopay.png';
+        global $MVX_Cointopay_Gateway;
+        $this->id = 'mvx-cointopay-payments';
+        $this->icon = $MVX_Cointopay_Gateway->plugin_url . 'assets/images/cointopay.png';
         $this->has_fields = false;
-        $this->method_title = __('Cointopay Payments (WCMp Compatible)', 'wcmp-cointopay-gateway');
-        $this->order_button_text = __('Proceed to Cointopay', 'wcmp-cointopay-gateway');
-        $this->notify_url = WC()->api_request_url('WCMp_Cointopay_Payments_Gateway');
+        $this->method_title = __('Cointopay Payments (MVX Compatible)', 'mvx-cointopay-gateway');
+        $this->order_button_text = __('Proceed to Cointopay', 'mvx-cointopay-gateway');
+        $this->notify_url = WC()->api_request_url('MVX_Cointopay_Payments_Gateway');
 
         $this->init_form_fields();
 
@@ -37,7 +37,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
      * @return array
      */
     public function process_payment($order_id) {global $woocommerce;
-		global $WCMp;
+		global $MVX;
 		
 		$order = wc_get_order($order_id);
 		$cointopay_alt_coin = get_post_meta( $order_id, 'cointopay_alt_coin', true);
@@ -118,48 +118,48 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 
         $this->form_fields = array(
             'enabled' => array(
-                'title' => __('Enable/Disable', 'wcmp-cointopay-gateway'),
+                'title' => __('Enable/Disable', 'mvx-cointopay-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Enable Cointopay Payments', 'wcmp-cointopay-gateway'),
+                'label' => __('Enable Cointopay Payments', 'mvx-cointopay-gateway'),
                 'default' => 'yes'
             ),
             'title' => array(
-                'title' => __('Title', 'wcmp-cointopay-gateway'),
+                'title' => __('Title', 'mvx-cointopay-gateway'),
                 'type' => 'text',
-                'description' => __('This controls the title which the user sees during checkout.', 'wcmp-cointopay-gateway'),
-                'default' => __('Cointopay', 'wcmp-cointopay-gateway'),
+                'description' => __('This controls the title which the user sees during checkout.', 'mvx-cointopay-gateway'),
+                'default' => __('Cointopay', 'mvx-cointopay-gateway'),
                 'desc_tip' => true,
             ),
             'description' => array(
-                'title' => __('Description', 'wcmp-cointopay-gateway'),
+                'title' => __('Description', 'mvx-cointopay-gateway'),
                 'type' => 'textarea',
-                'description' => __('This controls the description which the user sees during checkout.', 'wcmp-cointopay-gateway'),
-                'default' => __('Pay via Cointopay', 'wcmp-cointopay-gateway')
+                'description' => __('This controls the description which the user sees during checkout.', 'mvx-cointopay-gateway'),
+                'default' => __('Pay via Cointopay', 'mvx-cointopay-gateway')
             ),
             'cointopay_merchant_id' => array(
-                'title' => __('Cointopay Merchant Id', 'wcmp-cointopay-gateway'),
+                'title' => __('Cointopay Merchant Id', 'mvx-cointopay-gateway'),
                 'type' => 'text',
-                'description' => __('Please enter your Cointopay Merchant Id; this is needed in order to take payment.', 'wcmp-cointopay-gateway'),
+                'description' => __('Please enter your Cointopay Merchant Id; this is needed in order to take payment.', 'mvx-cointopay-gateway'),
                 'default' => '',
                 'desc_tip' => true,
             ),
             'cointopay_security_code' => array(
-                'title' => __('Cointopay Security Code', 'wcmp-cointopay-gateway'),
+                'title' => __('Cointopay Security Code', 'mvx-cointopay-gateway'),
                 'type' => 'text',
-                'description' => __('Please enter your Cointopay Security Code; this is needed in order to take payment.', 'wcmp-cointopay-gateway'),
+                'description' => __('Please enter your Cointopay Security Code; this is needed in order to take payment.', 'mvx-cointopay-gateway'),
                 'default' => '',
                 'desc_tip' => true,
             ),
             'debug' => array(
-                'title' => __('Debug Log', 'wcmp-cointopay-gateway'),
+                'title' => __('Debug Log', 'mvx-cointopay-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Enable logging', 'wcmp-cointopay-gateway'),
+                'label' => __('Enable logging', 'mvx-cointopay-gateway'),
                 'default' => 'no',
                 'description' => '',
             )
         );
     }
-   public function wcmp_coins_select_options() {
+   public function mvx_coins_select_options() {
 		return array(
 			'' => __( 'Nope', 'cmb2' ),
 			'standard' => __( 'Option One', 'cmb2' ),
@@ -179,7 +179,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     }
 
     public function using_supported_currency() {
-        if (!in_array(get_woocommerce_currency(), apply_filters('wcmp_cointopay_supported_currencies', array('AUD', 'BRL', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'NOK', 'NZD', 'PHP', 'PLN', 'GBP', 'SGD', 'SEK', 'CHF', 'TWD', 'THB', 'TRY', 'USD')))) {
+        if (!in_array(get_woocommerce_currency(), apply_filters('mvx_cointopay_supported_currencies', array('AUD', 'BRL', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'NOK', 'NZD', 'PHP', 'PLN', 'GBP', 'SGD', 'SEK', 'CHF', 'TWD', 'THB', 'TRY', 'USD')))) {
             return false;
         }
 
@@ -187,18 +187,18 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     }
 
     public function gateway_not_configured_message() {
-        $id = 'woocommerce_wcmp-cointopay-payments_';
+        $id = 'woocommerce_mvx-cointopay-payments_';
 		$c_cointopay_merchant_id = intval($_POST[$id . 'cointopay_merchant_id']);
 		if (isset($c_cointopay_merchant_id) && 0 !== $c_cointopay_merchant_id){
         if (!empty($c_cointopay_merchant_id) && isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id)) {
             return;
         }
-        echo $c_cointopay_merchant_id.'<div class="error"><p><strong>' . __('Cointopay Payments Disabled For WC Marketplace', 'wcmp-cointopay-gateway') . '</strong>: ' . __('You must fill the Merchant ID, Security code options.', 'wcmp-cointopay-gateway') . '</p></div>';
+        echo $c_cointopay_merchant_id.'<div class="error"><p><strong>' . __('Cointopay Payments Disabled For WC Marketplace', 'mvx-cointopay-gateway') . '</strong>: ' . __('You must fill the Merchant ID, Security code options.', 'mvx-cointopay-gateway') . '</p></div>';
 		}
     }
 
     public function unsupported_currency_not_message() {
-        echo '<div class="error"><p><strong>' . __('Cointopay Payments Disabled', 'wcmp-cointopay-gateway') . '</strong>: ' . __('Cointopay does not support your store currency.', 'wcmp-cointopay-gateway') . '</p></div>';
+        echo '<div class="error"><p><strong>' . __('Cointopay Payments Disabled', 'mvx-cointopay-gateway') . '</strong>: ' . __('Cointopay does not support your store currency.', 'mvx-cointopay-gateway') . '</p></div>';
     }
 
     public function cointopay_ipn_response() {
@@ -248,7 +248,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 				$order->update_status( 'completed', sprintf( __( 'IPN: Payment completed notification from Cointopay', 'woocommerce' ) ) );
 
 			}
-			 $order->add_order_note(__('The payment was successful.', 'wcmp-cointopay-gateway'));
+			 $order->add_order_note(__('The payment was successful.', 'mvx-cointopay-gateway'));
 		     $order->payment_complete();
 		
 			get_header();
@@ -407,8 +407,8 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 			}
     protected function delete_associated_commission($order_id) {
         global $wpdb;
-        if (WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
-            $vendor_orders_in_order = get_wcmp_vendor_orders(array('order_id' => $order_id));
+        if (MVX_Cointopay_Gateway_Dependencies::mvx_active_check()) {
+            $vendor_orders_in_order = get_mvx_vendor_orders(array('order_id' => $order_id));
             if (!empty($vendor_orders_in_order)) {
                 $commission_ids = wp_list_pluck($vendor_orders_in_order, 'commission_id');
                 if ($commission_ids && is_array($commission_ids)) {
@@ -417,7 +417,7 @@ class WCMP_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
                     }
                 }
             }
-            $wpdb->delete($wpdb->prefix . 'wcmp_vendor_orders', array('order_id' => $order_id), array('%d'));
+            $wpdb->delete($wpdb->prefix . 'mvx_vendor_orders', array('order_id' => $order_id), array('%d'));
             delete_post_meta($order_id, '_commissions_processed');
         }
     }

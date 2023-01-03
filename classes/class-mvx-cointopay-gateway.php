@@ -1,6 +1,6 @@
 <?php
 
-class WCMP_Cointopay_Gateway {
+class MVX_Cointopay_Gateway {
 
     public $plugin_url;
     public $plugin_path;
@@ -20,14 +20,14 @@ class WCMP_Cointopay_Gateway {
         $this->file = $file;
         $this->plugin_url = trailingslashit(plugins_url('', $plugin = $file));
         $this->plugin_path = trailingslashit(dirname($file));
-        $this->token = 'wcmp-cointopay-gateway';
+        $this->token = 'mvx-cointopay-gateway';
         $this->version = '1.2.6';
 
         add_action('init', array(&$this, 'init'), 0);
-        $wcmp_cointopay_settings = get_option('woocommerce_wcmp-cointopay-payments_settings');
-        $this->payment_admin_settings = get_option('wcmp_payment_settings_name');
+        $mvx_cointopay_settings = get_option('woocommerce_mvx-cointopay-payments_settings');
+        $this->payment_admin_settings = get_option('mvx_payment_settings_name');
 		
-        if (isset($wcmp_cointopay_settings['enabled']) && $wcmp_cointopay_settings['enabled'] == 'yes' && WCMP_Cointopay_Gateway_Dependencies::wcmp_active_check()) {
+        if (isset($mvx_cointopay_settings['enabled']) && $mvx_cointopay_settings['enabled'] == 'yes' && MVX_Cointopay_Gateway_Dependencies::mvx_active_check()) {
             add_action('woocommerce_order_status_cancelled', array(&$this, 'woocommerce_order_status_cancelled'));
         }
     }
@@ -39,7 +39,7 @@ class WCMP_Cointopay_Gateway {
 
         if (!is_admin() || defined('DOING_AJAX')) {
             $this->load_class('frontend');
-            $this->frontend = new WCMP_Cointopay_Gateway_Frontend();
+            $this->frontend = new MVX_Cointopay_Gateway_Frontend();
         }
         if (class_exists('WC_Payment_Gateway')) {
             $this->load_class('payment-method');
@@ -53,7 +53,7 @@ class WCMP_Cointopay_Gateway {
      * @return array payment methods
      */
     public function add_cointopay_gateway($methods) {
-        $methods[] = 'WCMP_Cointopay_Gateway_Payment_Method';
+        $methods[] = 'MVX_Cointopay_Gateway_Payment_Method';
         return $methods;
     }
 
@@ -62,8 +62,8 @@ class WCMP_Cointopay_Gateway {
         if (!$order = wc_get_order($order_id)) {
             return;
         }
-        if ('wcmp-cointopay-payments' == $order->get_payment_method()) {
-            $vendor_orders_in_order = get_wcmp_vendor_orders(array('order_id' => $order_id));
+        if ('mvx-cointopay-payments' == $order->get_payment_method()) {
+            $vendor_orders_in_order = get_mvx_vendor_orders(array('order_id' => $order_id));
             if (!empty($vendor_orders_in_order)) {
                 $commission_ids = wp_list_pluck($vendor_orders_in_order, 'commission_id');
                 if ($commission_ids && is_array($commission_ids)) {
@@ -72,7 +72,7 @@ class WCMP_Cointopay_Gateway {
                     }
                 }
             }
-            $wpdb->delete($wpdb->prefix . 'wcmp_vendor_orders', array('order_id' => $order_id), array('%d'));
+            $wpdb->delete($wpdb->prefix . 'mvx_vendor_orders', array('order_id' => $order_id), array('%d'));
             delete_post_meta($order_id, '_commissions_processed');
         }
     }

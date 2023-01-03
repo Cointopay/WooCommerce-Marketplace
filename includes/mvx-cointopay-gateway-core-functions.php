@@ -23,7 +23,7 @@ if (!function_exists('woocommerce_inactive_notice')) {
     function woocommerce_inactive_notice() {
         ?>
         <div id="message" class="error">
-            <p><?php printf(__('%sWCMp Cointopay Gateway is inactive.%s The %sWooCommerce plugin%s must be active for the WCMp Cointopay Gateway to work. Please %sinstall & activate WooCommerce%s', 'wcmp-cointopay-gateway'), '<strong>', '</strong>', '<a target="_blank" href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>', '<a href="' . admin_url('plugins.php') . '">', '&nbsp;&raquo;</a>'); ?></p>
+            <p><?php printf(__('%sMVX Cointopay Gateway is inactive.%s The %sWooCommerce plugin%s must be active for the MVX Cointopay Gateway to work. Please %sinstall & activate WooCommerce%s', 'mvx-cointopay-gateway'), '<strong>', '</strong>', '<a target="_blank" href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>', '<a href="' . admin_url('plugins.php') . '">', '&nbsp;&raquo;</a>'); ?></p>
         </div>
         <?php
     }
@@ -36,8 +36,8 @@ if (!function_exists('doCointopayLog')) {
      * Write to log file
      */
     function doCointopayLog($str) {
-        global $WCMP_Cointopay_Gateway;
-        $file = $WCMP_Cointopay_Gateway->plugin_path . 'log/wcmp-cointopay-gateway.log';
+        global $MVX_Cointopay_Gateway;
+        $file = $MVX_Cointopay_Gateway->plugin_path . 'log/mvx-cointopay-gateway.log';
         if (file_exists($file)) {
             // Open the file to get existing content
             $current = file_get_contents($file);
