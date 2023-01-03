@@ -6,7 +6,7 @@ Tags: cointopay gateway, mvx, wc marketplace, commission, vendor
 
 Requires at least: 4.2
 
-Tested up to: 6.0.0
+Tested up to: 6.1.1
 
 Stable tag: 1.2.7
 
