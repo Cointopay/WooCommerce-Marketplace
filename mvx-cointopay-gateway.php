@@ -1,8 +1,7 @@
 <?php
-
 /**
  * Plugin Name: MVX Cointopay Gateway
- * Plugin URI: https://cointopay.com/
+ * Plugin URI: https://app.cointopay.com/
  * Description: MVX Cointopay Gateway is a payment gateway for woocommerce shopping plateform also compatible with WC Marketplace.
  * Author: Cointopay.com
  * Version: 1.2.7
