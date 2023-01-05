@@ -21,8 +21,6 @@ A Free Payment Gateway for WC Marketplace allowing you to Pay Your Vendors Using
 
 # Description
 
-For updated version go and download <a href="https://github.com/Cointopay/Wordpress-MultivendorX">here</a>
-
 The much awaited <strong>MVX Cointopay Payment gateway</strong> is now live.
 
 <strong>MVX Cointopay Gateway</strong> is a <strong>WC Marketplace</strong> add-on that allows instant (chain or parallel) payment to vendors.
