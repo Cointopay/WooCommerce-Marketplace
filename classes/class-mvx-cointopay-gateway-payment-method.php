@@ -169,7 +169,7 @@ class MVX_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
    }
    protected function admin_notices() {
         if (is_admin()) {
-            if ('yes' == $this->get_option('enabled') && ( empty($this->cointopay_merchant_id) || empty($this->cointopay_security_code) || empty($this->receiver_email) )) {
+            if ('yes' == $this->get_option('enabled') && ( empty($this->cointopay_merchant_id) || empty($this->cointopay_security_code) )) {
                 add_action('admin_notices', array($this, 'gateway_not_configured_message'));
             }
             if (!$this->using_supported_currency()) {
@@ -187,18 +187,11 @@ class MVX_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
     }
 
     public function gateway_not_configured_message() {
-        $id = 'woocommerce_mvx-cointopay-payments_';
-		$c_cointopay_merchant_id = intval($_POST[$id . 'cointopay_merchant_id']);
-		if (isset($c_cointopay_merchant_id) && 0 !== $c_cointopay_merchant_id){
-        if (!empty($c_cointopay_merchant_id) && isset($c_cointopay_merchant_id) && !empty($c_cointopay_merchant_id)) {
-            return;
-        }
-        echo $c_cointopay_merchant_id.'<div class="error"><p><strong>' . __('Cointopay Payments Disabled For WC Marketplace', 'mvx-cointopay-gateway') . '</strong>: ' . __('You must fill the Merchant ID, Security code options.', 'mvx-cointopay-gateway') . '</p></div>';
-		}
+        echo '<div class="error"><p><strong>' . esc_html__('Cointopay Payments Disabled For WC Marketplace', 'mvx-cointopay-gateway') . '</strong>: ' . esc_html__('You must fill the Merchant ID, Security code options.', 'mvx-cointopay-gateway') . '</p></div>';
     }
 
     public function unsupported_currency_not_message() {
-        echo '<div class="error"><p><strong>' . __('Cointopay Payments Disabled', 'mvx-cointopay-gateway') . '</strong>: ' . __('Cointopay does not support your store currency.', 'mvx-cointopay-gateway') . '</p></div>';
+        echo '<div class="error"><p><strong>' . esc_html__('Cointopay Payments Disabled', 'mvx-cointopay-gateway') . '</strong>: ' . esc_html__('Cointopay does not support your store currency.', 'mvx-cointopay-gateway') . '</p></div>';
     }
 
     public function cointopay_ipn_response() {
@@ -401,8 +394,6 @@ class MVX_Cointopay_Gateway_Payment_Method extends WC_Payment_Gateway {
 								get_footer();
 							  exit;
 				  }
-			   
-				   echo $response;
 				  
 			}
     protected function delete_associated_commission($order_id) {

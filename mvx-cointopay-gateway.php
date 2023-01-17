@@ -24,16 +24,15 @@ if(!MVX_Cointopay_Gateway_Dependencies::woocommerce_active_check()){
 }
 
 if (!class_exists('MVX_Cointopay_Gateway') && MVX_Cointopay_Gateway_Dependencies::woocommerce_active_check()) {
-    require_once( ABSPATH . 'wp-content/plugins/mvx-cointopay-gateway/classes/class-mvx-cointopay-gateway.php' );
+	require_once( dirname(__FILE__) . '/classes/class-mvx-cointopay-gateway.php' );
     global $MVX_Cointopay_Gateway;
 	
     $MVX_Cointopay_Gateway = new MVX_Cointopay_Gateway(__FILE__);
     $GLOBALS['MVX_Cointopay_Gateway'] = $MVX_Cointopay_Gateway;
 	function MVX_Cointopay_Gateway_admin_js() {
-    $url = plugins_url('assets/js/mvx_custom_js.js', __FILE__);
-    echo '<script type="text/javascript" src="'. $url . '"></script>';
+		wp_enqueue_script( 'mvx-ctp-custom-js', plugins_url('assets/js/mvx_custom_js.js', __FILE__), array(), '1.0.0', true );
 	}
-	add_action('wp_footer', 'MVX_Cointopay_Gateway_admin_js');
+	add_action('wp_enqueue_scripts', 'MVX_Cointopay_Gateway_admin_js');
 }
 add_action( 'wp_ajax_nopriv_getMerchantCoinsByAjax', 'getMerchantCoinsByAjax' );
 add_action( 'wp_ajax_getMerchantCoinsByAjax', 'getMerchantCoinsByAjax' );
@@ -47,7 +46,7 @@ function getMerchantCoinsByAjax()
 		$arr = getMerchantCoins($merchantId);
 		foreach($arr as $key => $value)
 		{
-			$option .= '<option value="'.$key.'">'.$value.'</option>';
+			$option .= '<option value="'.esc_attr($key).'">'.esc_attr($value).'</option>';
 		}
 		
 		echo $option;exit();
@@ -118,7 +117,7 @@ function cointopay_process_custom_payment(){
 //* Update the order meta with field value
  add_action('woocommerce_checkout_update_order_meta', 'cointopay_select_checkout_field_update_order_meta');
  function cointopay_select_checkout_field_update_order_meta( $order_id ) {
-	if ($_POST['cointopay_alt_coin']) update_post_meta( $order_id, 'cointopay_alt_coin', esc_attr($_POST['cointopay_alt_coin']));
+	if (isset($_POST['cointopay_alt_coin'])) update_post_meta( $order_id, 'cointopay_alt_coin', sanitize_text_field($_POST['cointopay_alt_coin']));
  }
 add_action( 'woocommerce_after_order_notes', 'cointopay_checkout_hidden_field', 10, 1 );
 function cointopay_checkout_hidden_field( $checkout ) {
@@ -130,7 +129,7 @@ function cointopay_checkout_hidden_field( $checkout ) {
 			$cointopay_merchant_id = $cointopay_payments_settings['cointopay_merchant_id'];
 
 			// Output the hidden link
-		   echo '<input type="hidden" class="input-hidden" name="cointopay_merchant_id" id="cointopay_merchant_id" value="' . $cointopay_merchant_id . '" />';
+		   echo '<input type="hidden" class="input-hidden" name="cointopay_merchant_id" id="cointopay_merchant_id" value="' . intval($cointopay_merchant_id) . '" />';
 		}
 	}
 }
@@ -143,4 +142,3 @@ function mvx_cointopay_pluginname_ajaxurl()
 	</script>
 <?php
 }
-		
